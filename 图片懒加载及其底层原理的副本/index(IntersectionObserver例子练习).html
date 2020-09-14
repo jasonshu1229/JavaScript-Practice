@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .box {
+      width: 300px;
+      margin: 1300px auto;
+    }
+
+    .box img {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="box" id="box">
+    <img src="images/1.jpg">
+  </div>
+  
+  <script>
+    let observer = new IntersectionObserver(changes => {
+      /*
+        changes 包含所有的监听对象的信息（是一个数组）
+        target 当前监听的对象
+        boundingClientRect 元素的位置坐标信息
+        isIntersecting 是否出现在视口中
+      */
+      // console.log(changes)
+      console.log('ok'); // 一开始会渲染一次，然后进入到视口又会触发一次
+      let item = changes[0];
+      if(item.isIntersecting) {
+        // unobserve 移除监听
+        observer.unobserve(item.target);
+      }
+    });
+
+    observer.observe(box);
+    
+  </script>
+</body>
+
+</html>

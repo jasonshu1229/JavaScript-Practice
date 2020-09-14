@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    #box {
+      width: 100px;
+      height: 100px;
+      background-color: pink;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="box" id="box"></div>
+  <!-- 拖拽案例中一个经典问题：鼠标焦点丢失问题
+    => 鼠标移动过快，鼠标会脱离拖拽的盒子，在盒子外面鼠标移动移动无法触发盒子的mousemove，盒子不会在跟着计算最新的位置
+    => 在盒子外面松开鼠标，也不会触发盒子的mouseup,导致mousemove事件没有被移除，鼠标重新进入盒子，不管是否按住，盒子都会跟着走
+    ...
+    ...
+    【IE和火狐浏览器中】
+        setCapture / releaseCapture：可以实现把元素和鼠标绑定在一起（或者移除绑定）的效果，防止鼠标焦点丢失0
+    【谷歌中的解决方案】
+        鼠标移动再快，也逃离不出 document的区域范围
+        所以在项目中，把 move和up方法绑定在document，而不是盒子（适用于浏览器）
+  -->
+  <script>
+    let box = document.getElementById('box');
+    // 在不确定当前元素的某个事件新闻给是否可能绑定多个方法的情况下
+    // 尽可能使用 DOM2事件绑定的方式实现 
+    box.addEventListener('mousedown', down, false); // 冒泡
+    
+
+    // 鼠标按下做的事情
+    function down(ev) {
+      // 1. 记录鼠标和盒子的起始位置 （需要在move方法中使用，所以把值都记录在元素的自定义属性上，这样在move中就可以通过自定义属性获取）
+      this.startX = ev.clientX; // 鼠标的起始位置X
+      this.startY = ev.clientY; // 鼠标的起始位置Y
+      this.startL = this.offsetLeft; // 盒子的起始偏移量X
+      this.startT = this.offsetTop; // 盒子的起始偏移量Y
+      // TODO：这样处理处理后move/up中的this是 document（但是我们需要保证this是盒子本身才可以）
+      // TODO:  move.bind()会返回一个代理函数，所以绑定给事件的是代理函数（bind返回一个匿名函数），以后移除的也应该是代理函数（移除绑定时返回的代理函数）才可以
+      this._MOVE = move.bind(this);
+      this._UP = up.bind(this);
+      document.addEventListener('mousemove', this._MOVE, false); // 冒泡
+      document.addEventListener('mouseup', this._UP, false); // 冒泡
+
+      // this.setCapture();
+    }
+
+    // 鼠标移动时候做的事情
+    function move(ev) {
+      let curL = ev.clientX - this.startX + this.startL;
+      let curT = ev.clientY - this.startY + this.startT;
+      // this.style.top = curT + 'px';
+      // this.style.left = curL + 'px';
+      // 如果给 style里设置多个样式（可替换成如下写法）
+      this.style.cssText = `left:${curL}px; top:${curT}px`;
+    }
+
+    // 鼠标抬起时候做的事情
+    function up(ev) {
+      document.removeEventListener('mousemove', this._MOVE , false); // 冒泡
+      document.removeEventListener('mouseup', this._UP, false); // 冒泡
+
+      // this.releaseCapture();
+    }
+  </script>
+  
+</body>
+</html>
