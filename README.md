@@ -10,3 +10,5 @@
 - 将节流与真实项目开发图片延迟加载结合使用
 - 终极方案：IntersectionObserver
 - 未来设想：img.loading = "lazy"（有兼容性问题）
+
+![](https://tva1.sinaimg.cn/large/007S8ZIlly1giqhc79cawj30vs0lmjt3.jpg)
